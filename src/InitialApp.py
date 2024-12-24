@@ -15,6 +15,8 @@ films = [
 ]
 
 filtered = []
+addedfilm = {}
+selected_film = {}
 
 isAdd = False
 isFilter = False
@@ -40,7 +42,7 @@ class InitialApp(tk.Tk):
         self.show_frame(FilmManegementFrame)
 
     def show_frame(self, cont):
-        global isAdd, isFilter
+        global isAdd, isFilter, isEdit
         frame = self.frames[cont]
         frame.tkraise()
 
@@ -85,9 +87,10 @@ class FilmManegementFrame(tk.Frame):
             anchor="nw",
             text="Film Management App",
             fg="#FF7F50", 
-            font=("coral", 24, "bold")
+            font=("coral", 62, "bold"),
+            bg = "#2E3440"
         )
-        self.label_t.place(x=265.0, y=50.0)
+        self.label_t.place(x=0.0, y=0.0)
 
         self.label_t1 = tk.Label(
             self,
@@ -304,6 +307,13 @@ class FilmEntryFrame(tk.Frame):
     def on_submit_button_clicked(self, frame, name=None,type=None,status=None,star=None,note=None):
         global films
         global filtered
+        global addedfilm
+        addedfilm = {}
+        addedfilm["name"] = name
+        addedfilm["type"] = type
+        addedfilm["status"] = status
+        addedfilm["star"] = int(star)
+        addedfilm["note"] = note
         filtered = []
         temp_filtered = []
         filtered_films = films
@@ -419,7 +429,7 @@ class FilmListFrame(tk.Frame):
         self.delete_button = ttk.Button(
             self,
             text="Delete",
-            command= lambda: print("Delete button clicked")
+            command= lambda: self.delete_data()
         )
         self.delete_button.place(
             x=617.0,
@@ -441,6 +451,13 @@ class FilmListFrame(tk.Frame):
         global isFilter
         isFilter = True
         self.controller1.show_frame(FilmEntryFrame)
+
+    def add_data(self):
+        global films
+        global addedfilm
+        films.append(addedfilm)
+        self.list_data()
+
     
     def list_data(self):
         global films
@@ -461,6 +478,30 @@ class FilmListFrame(tk.Frame):
         global isEdit
         isEdit = True
         self.controller1.show_frame(FilmEntryFrame)
+
+    def delete_data(self):
+        global films
+        selected_item = self.tree.selection()  # Seçilen öğeyi al
+        if selected_item:
+        # Seçilen öğenin değerlerini al (tüm sütunlar)
+            film_values = self.tree.item(selected_item, "values")
+            film_to_delete = {
+                "name": film_values[0],
+                "type": film_values[1],
+                "status": film_values[2],
+                "star": int(film_values[3]),
+                "note": film_values[4],
+            }
+
+        # Tüm bileşenlere göre eşleşen filmi bul ve sil
+        for i, film in enumerate(films):
+            if film == film_to_delete:
+                del films[i]
+                break
+
+        self.tree.delete(selected_item)  # Treeview'den öğeyi sil
+        print(f"{film_to_delete['name']} başariyla silindi.")
+        print(films)
     
 app = InitialApp()
 app.mainloop()
