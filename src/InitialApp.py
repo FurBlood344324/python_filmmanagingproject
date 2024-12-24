@@ -1,14 +1,11 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, PhotoImage, Button
 import tkinter as tk
 import sys, json
 from tkinter import ttk
 from PIL import Image, ImageTk
 
-#Ana Sayfaya Dön butonu eklenecek
-
 filtered = []
-addedfilm = {}
+inputfilm = {}
 selected_film = {}
 
 isAdd = False
@@ -18,29 +15,18 @@ isEdit = False
 class Controller:
     def __init__(self):
         self.films = self.loadFilms()
+
     def loadFilms(self):
         try:
             with open('films.json', 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
             return []
-    def saveFilms(self):   
-        global addedfilm     
-        filmData = {
-            "name": addedfilm["name"],
-            "type": addedfilm["type"],
-            "status": addedfilm["status"],
-            "star": int(addedfilm["star"] or 0),
-            "note": addedfilm["note"]
-        }
-        try:
-            with open('films.json', 'r', encoding='utf-8') as f:
-                films = json.load(f)
-        except FileNotFoundError:
-            films = []
-        films.append(filmData)
+        
+    def saveFilms(self, filmsdata=None):       
+        self.films = filmsdata
         with open('films.json', 'w', encoding='utf-8') as f:
-            json.dump(films, f, ensure_ascii=False, indent=4)
+            json.dump(self.films, f, ensure_ascii=False, indent=4)
     
 
 class InitialApp(tk.Tk):
@@ -72,9 +58,6 @@ class InitialApp(tk.Tk):
         elif cont == FilmListFrame and hasattr(frame, 'refresh_data') and isFilter:
             isFilter = False
             frame.refresh_data()
-        elif cont == FilmListFrame and hasattr(frame, 'edit_data') and isEdit:
-            isEdit = False
-            frame.edit_data()
         elif cont == FilmListFrame and hasattr(frame, 'list_data'):
             frame.list_data()
         
@@ -303,7 +286,7 @@ class FilmEntryFrame(tk.Frame):
         button = tk.Button(
             self, 
             text="Submit", 
-            command=lambda : self.on_submit_button_clicked(FilmListFrame, self.name.get(), self.type.get(), self.status.get(), self.star.get(), self.note.get()),
+            command=lambda : self.on_submit_button_clicked(FilmListFrame, self.name, self.type, self.status, self.star, self.note),
             bg="#D8A657", 
             fg="#2E3440", 
             font=("Helvetica", 14, "bold")
@@ -311,6 +294,21 @@ class FilmEntryFrame(tk.Frame):
         button.place(
             x=225.0, 
             y=450.0, 
+            width=300.0, 
+            height=37.0
+        )
+
+        backbutton = tk.Button(
+            self, 
+            text="Back", 
+            command=lambda : self.controller1.show_frame(FilmManegementFrame),
+            bg="#D8A657", 
+            fg="#2E3440", 
+            font=("Helvetica", 14, "bold")
+        )
+        backbutton.place(
+            x=225.0, 
+            y=500.0, 
             width=300.0, 
             height=37.0
         )
@@ -325,53 +323,65 @@ class FilmEntryFrame(tk.Frame):
         return Path(__file__).parent / 'assets' / 'frame1' 
     
     def on_submit_button_clicked(self, frame, name=None,type=None,status=None,star=None,note=None):
-        global filtered
-        global addedfilm
+        global filtered, selected_film, inputfilm, isFilter, isEdit
         c = Controller()
         films = c.loadFilms()
-        addedfilm = {}
-        addedfilm["name"] = name
-        addedfilm["type"] = type
-        addedfilm["status"] = status
-        addedfilm["star"] = int(star)
-        addedfilm["note"] = note
+        inputfilm = {
+            "name": name.get(),
+            "type": type.get(),
+            "status": status.get(),
+            "star": int(star.get()),
+            "note": note.get()
+        }
         filtered = []
         temp_filtered = []
-        filtered_films = films
-        if name:
-            temp_filtered = []
-            for film in filtered_films:
-                if name.lower() in film["name"].lower():
-                    temp_filtered.append(film)
-            filtered_films = temp_filtered
-        if type:
-            temp_filtered = []
-            for film in filtered_films:
-                if type.lower() in film["type"].lower():
-                    temp_filtered.append(film)
-            filtered_films = temp_filtered
 
-        if status:
-            temp_filtered = []
-            for film in filtered_films:
-                if status.lower() in film["status"].lower():
-                    temp_filtered.append(film)
-            filtered_films = temp_filtered
-        if star != "0":
-            temp_filtered = []
-            for film in filtered_films:
-                if film["star"] == int(star):
-                    temp_filtered.append(film)
-            filtered_films = temp_filtered
-
-        if note:
-            temp_filtered = []
-            for film in filtered_films:
-                if note.lower() in film["note"].lower():
-                    temp_filtered.append(film)
-            filtered_films = temp_filtered
-        filtered = filtered_films
-        print(filtered)
+        if isFilter:            
+            filtered_films = films
+            if name.get():
+                temp_filtered = []
+                for film in filtered_films:
+                    if name.get().lower() in film["name"].lower():
+                        temp_filtered.append(film)
+                filtered_films = temp_filtered
+            if type.get():
+                temp_filtered = []
+                for film in filtered_films:
+                    if type.get().lower() in film["type"].lower():
+                        temp_filtered.append(film)
+                filtered_films = temp_filtered
+            if status.get():
+                temp_filtered = []
+                for film in filtered_films:
+                    if status.get().lower() in film["status"].lower():
+                        temp_filtered.append(film)
+                filtered_films = temp_filtered
+            if star.get() != "0":
+                temp_filtered = []
+                for film in filtered_films:
+                    if film["star"] == int(star.get()):
+                        temp_filtered.append(film)
+                filtered_films = temp_filtered
+            if note.get():
+                temp_filtered = []
+                for film in filtered_films:
+                    if note.get().lower() in film["note"].lower():
+                        temp_filtered.append(film)
+                filtered_films = temp_filtered
+            filtered = filtered_films
+        elif isEdit:
+            for i, film in enumerate(films):
+                if film == selected_film:
+                    films[i] = inputfilm
+                    break
+            c.saveFilms(films)
+            print("Edited")
+            isEdit = False
+        name.delete(0, tk.END)
+        type.delete(0, tk.END)
+        status.delete(0, tk.END)
+        star.delete(0, 0)
+        note.delete(0, tk.END)
         self.controller1.show_frame(frame)
         
 
@@ -431,19 +441,19 @@ class FilmListFrame(tk.Frame):
         self.filter_button.place(
             x=78.0,
             y=500.0,
-            width=186.0,
+            width=166.25,
             height=48.0
         )
 
         self.edit_button = ttk.Button(
             self,
             text="Edit",
-            command= lambda: print("Edit button clicked")
+            command= lambda: self.edit_data()
         )
         self.edit_button.place(
-            x=347.5,
+            x=264.25,
             y=500.0,
-            width=186.0,
+            width=166.25,
             height=48.0
         )
 
@@ -453,9 +463,21 @@ class FilmListFrame(tk.Frame):
             command= lambda: self.delete_data()
         )
         self.delete_button.place(
-            x=617.0,
+            x=450.5,
             y=500.0,
-            width=186.0,
+            width=166.25,
+            height=48.0
+        )
+
+        self.back_button = ttk.Button(
+            self,
+            text="Back",
+            command= lambda: self.controller1.show_frame(FilmManegementFrame)
+        )
+        self.back_button.place(
+            x=636.75,
+            y=500.0,
+            width=166.25,
             height=48.0
         )
 
@@ -474,11 +496,11 @@ class FilmListFrame(tk.Frame):
         self.controller1.show_frame(FilmEntryFrame)
 
     def add_data(self):
-        global addedfilm
+        global inputfilm
         c = Controller()
         films = c.loadFilms()
-        films.append(addedfilm)
-        c.saveFilms()
+        films.append(inputfilm)
+        c.saveFilms(films)
         self.list_data()
 
     
@@ -491,7 +513,6 @@ class FilmListFrame(tk.Frame):
             self.tree.insert("", "end", values=(film["name"], film["type"], film["status"], film["star"], film["note"]))
     
     def refresh_data(self):
-        print("Refreshing data")
         global filtered
         for i in self.tree.get_children():
             self.tree.delete(i)
@@ -499,16 +520,25 @@ class FilmListFrame(tk.Frame):
             self.tree.insert("", "end", values=(film["name"], film["type"], film["status"], film["star"], film["note"]))
 
     def edit_data(self):
-        global isEdit
+        global isEdit, selected_film
         isEdit = True
+        selected_item = self.tree.selection()
+        if selected_item:
+            film_values = self.tree.item(selected_item, "values")
+            selected_film = {
+                "name": film_values[0],
+                "type": film_values[1],
+                "status": film_values[2],
+                "star": int(film_values[3]),
+                "note": film_values[4],
+            }
         self.controller1.show_frame(FilmEntryFrame)
 
     def delete_data(self):
         c = Controller()
         films = c.loadFilms()
-        selected_item = self.tree.selection()  # Seçilen öğeyi al
+        selected_item = self.tree.selection() 
         if selected_item:
-        # Seçilen öğenin değerlerini al (tüm sütunlar)
             film_values = self.tree.item(selected_item, "values")
             film_to_delete = {
                 "name": film_values[0],
@@ -518,16 +548,13 @@ class FilmListFrame(tk.Frame):
                 "note": film_values[4],
             }
 
-        # Tüm bileşenlere göre eşleşen filmi bul ve sil
         for i, film in enumerate(films):
             if film == film_to_delete:
                 del films[i]
                 break
 
-        self.tree.delete(selected_item)  # Treeview'den öğeyi sil
-        print(f"{film_to_delete['name']} basariyla silindi.")
-        print(films)
-        c.saveFilms()
+        self.tree.delete(selected_item) 
+        c.saveFilms(films)
     
 app = InitialApp()
 app.mainloop()

@@ -1,107 +1,30 @@
 [
     {
-        "name": "asda",
+        "name": "sdfssfs",
+        "type": "Comedy",
+        "status": "Watched",
+        "star": 1,
+        "note": "sfsf"
+    },
+    {
+        "name": "dfsfsdfsfs",
+        "type": "Drama",
+        "status": "Not Watched",
+        "star": 3,
+        "note": "sfssf"
+    },
+    {
+        "name": "fdsfsdfsdf",
+        "type": "Drama",
+        "status": "Not Watched",
+        "star": 3,
+        "note": "sdfsfsdf"
+    },
+    {
+        "name": "abc",
         "type": "Comedy",
         "status": "Not Watched",
-        "star": 2,
-        "note": "fdsas"
-    },
-    {
-        "name": "asda",
-        "type": "Comedy",
-        "status": "Not Watched",
-        "star": 2,
-        "note": "fdsas"
-    },
-    {
-        "name": "asda",
-        "type": "Comedy",
-        "status": "Not Watched",
-        "star": 2,
-        "note": "fdsas"
-    },
-    {
-        "name": "asda",
-        "type": "Comedy",
-        "status": "Not Watched",
-        "star": 2,
-        "note": "fdsas"
-    },
-    {
-        "name": "das",
-        "type": "Comedy",
-        "status": "Watched",
-        "star": 5,
-        "note": "sd"
-    },
-    {
-        "name": "das",
-        "type": "Comedy",
-        "status": "Watched",
-        "star": 5,
-        "note": "sd"
-    },
-    {
-        "name": "das",
-        "type": "Comedy",
-        "status": "Watched",
-        "star": 5,
-        "note": "sd"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
         "star": 4,
-        "note": "nice"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
-        "star": 4,
-        "note": "nice"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
-        "star": 4,
-        "note": "nice"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
-        "star": 4,
-        "note": "nice"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
-        "star": 4,
-        "note": "nice"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
-        "star": 4,
-        "note": "nice"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
-        "star": 4,
-        "note": "nice"
-    },
-    {
-        "name": "spider man",
-        "type": "Action",
-        "status": "Watched",
-        "star": 4,
-        "note": "nice"
+        "note": "ggg"
     }
 ]
