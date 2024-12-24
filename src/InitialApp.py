@@ -1,18 +1,11 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, PhotoImage, Button
 import tkinter as tk
-import sys
+import sys, json
 from tkinter import ttk
 from PIL import Image, ImageTk
 
 #Ana Sayfaya Dön butonu eklenecek
-
-films = [
-    {"name": "The Matrix","type": "Sci-Fi" ,"status" : "Watched","star": 5, "note" : "1"},
-    {"name": "Inception","type": "Sci-Fi" ,"status" : "Not Watched", "star": 4, "note" : "2"},
-    {"name": "The Dark Knight","type": "Action" ,"status" : "Watched", "star": 5, "note" : "3"},
-    {"name": "The Matrix Reloaded","type": "Sci-Fi" , "status" : "Watched", "star": 4, "note" : "4"}
-]
 
 filtered = []
 addedfilm = {}
@@ -22,6 +15,33 @@ isAdd = False
 isFilter = False
 isEdit = False
 
+class Controller:
+    def __init__(self):
+        self.films = self.loadFilms()
+    def loadFilms(self):
+        try:
+            with open('films.json', 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return []
+    def saveFilms(self):   
+        global addedfilm     
+        filmData = {
+            "name": addedfilm["name"],
+            "type": addedfilm["type"],
+            "status": addedfilm["status"],
+            "star": int(addedfilm["star"] or 0),
+            "note": addedfilm["note"]
+        }
+        try:
+            with open('films.json', 'r', encoding='utf-8') as f:
+                films = json.load(f)
+        except FileNotFoundError:
+            films = []
+        films.append(filmData)
+        with open('films.json', 'w', encoding='utf-8') as f:
+            json.dump(films, f, ensure_ascii=False, indent=4)
+    
 
 class InitialApp(tk.Tk):
     def __init__(self):
@@ -305,9 +325,10 @@ class FilmEntryFrame(tk.Frame):
         return Path(__file__).parent / 'assets' / 'frame1' 
     
     def on_submit_button_clicked(self, frame, name=None,type=None,status=None,star=None,note=None):
-        global films
         global filtered
         global addedfilm
+        c = Controller()
+        films = c.loadFilms()
         addedfilm = {}
         addedfilm["name"] = name
         addedfilm["type"] = type
@@ -453,14 +474,17 @@ class FilmListFrame(tk.Frame):
         self.controller1.show_frame(FilmEntryFrame)
 
     def add_data(self):
-        global films
         global addedfilm
+        c = Controller()
+        films = c.loadFilms()
         films.append(addedfilm)
+        c.saveFilms()
         self.list_data()
 
     
     def list_data(self):
-        global films
+        c = Controller()
+        films = c.loadFilms()
         for i in self.tree.get_children():
             self.tree.delete(i)
         for film in films:
@@ -480,7 +504,8 @@ class FilmListFrame(tk.Frame):
         self.controller1.show_frame(FilmEntryFrame)
 
     def delete_data(self):
-        global films
+        c = Controller()
+        films = c.loadFilms()
         selected_item = self.tree.selection()  # Seçilen öğeyi al
         if selected_item:
         # Seçilen öğenin değerlerini al (tüm sütunlar)
@@ -500,8 +525,9 @@ class FilmListFrame(tk.Frame):
                 break
 
         self.tree.delete(selected_item)  # Treeview'den öğeyi sil
-        print(f"{film_to_delete['name']} başariyla silindi.")
+        print(f"{film_to_delete['name']} basariyla silindi.")
         print(films)
+        c.saveFilms()
     
 app = InitialApp()
 app.mainloop()
