@@ -38,7 +38,7 @@ pip install Pillow
 
 3. Run the application:
 ```bash
-python main.py
+python InitialApp.py
 ```
 
 ## 🎯 Usage
