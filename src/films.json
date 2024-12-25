@@ -1,37 +1,30 @@
 [
     {
-        "name": "sdfssfs",
+        "name": "Spider man 6",
         "type": "Comedy",
+        "status": "Not Watched",
+        "star": 5,
+        "note": "Nice"
+    },
+    {
+        "name": "Spider man",
+        "type": "Action",
         "status": "Watched",
-        "star": 1,
-        "note": "sfsf"
+        "star": 5,
+        "note": "good"
     },
     {
-        "name": "dfsfsdfsfs",
+        "name": "Rdr",
         "type": "Drama",
-        "status": "Not Watched",
-        "star": 3,
-        "note": "sfssf"
+        "status": "Watche",
+        "star": 2,
+        "note": "adsa"
     },
     {
-        "name": "fdsfsdfsdf",
-        "type": "Drama",
-        "status": "Not Watched",
-        "star": 3,
-        "note": "sdfsfsdf"
-    },
-    {
-        "name": "abc",
-        "type": "Comedy",
-        "status": "Not Watched",
-        "star": 4,
-        "note": "ggg"
-    },
-    {
-        "name": "wdsadsa",
-        "type": "",
-        "status": "",
-        "star": 0,
-        "note": ""
+        "name": "Pride and prejudice",
+        "type": "Romance",
+        "status": "Watched",
+        "star": 5,
+        "note": "good film"
     }
 ]
