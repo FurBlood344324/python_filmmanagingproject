@@ -3,6 +3,9 @@ import tkinter as tk
 import sys, json
 from tkinter import ttk
 from PIL import Image, ImageTk
+from tkinter import messagebox
+from tkinter import simpledialog
+from tkinter.messagebox import askyesno
 
 filtered = []
 inputfilm = {}
@@ -80,20 +83,24 @@ class FilmManegementFrame(tk.Frame):
         self.grid_propagate(False) 
         self.pack_propagate(False)
         
-        self.image = Image.open(self.relative_to_assets("image_2.jpg"))
-        self.photo = ImageTk.PhotoImage(self.image)
-        self.label_b = tk.Label(self, image=self.photo)
+        self.image1 = Image.open(self.relative_to_assets("image_2.jpg"))
+        self.photo1 = ImageTk.PhotoImage(self.image1)
+        self.label_b = tk.Label(self, image=self.photo1)
         self.label_b.place(x=0, y=0)
+
+        self.image2 = Image.open(self.relative_to_assets("image_3o.png")).resize((881,120))
+        self.photo2 = ImageTk.PhotoImage(self.image2)
 
         self.label_t = tk.Label(
             self,
-            anchor="nw",
+            compound="center",
             text="Film Management App",
-            fg="#FF7F50", 
-            font=("coral", 62, "bold"),
-            bg = "#2E3440"
+            fg="#E5E4E2", 
+            font=("coral", 36, "bold"),
+            bg = "#2E3440",
+            image=self.photo2
         )
-        self.label_t.place(x=0.0, y=0.0)
+        self.label_t.place(x=0, y=0)
 
         self.label_t1 = tk.Label(
             self,
@@ -193,10 +200,14 @@ class FilmEntryFrame(tk.Frame):
             bg="#2E3440", 
             fg="#D8A657"
         )
-        label1.place(x=78.0, y=75.0, width=100.0, height=37.0)
+        label1.place(
+            x=152.5, 
+            y=75.0, 
+            width=100.0,
+            height=37.0)
         self.name = tk.Entry(self)
         self.name.place(
-            x=225.0, 
+            x=299.5, 
             y=75.0, 
             width=300.0, 
             height=37.0
@@ -208,13 +219,17 @@ class FilmEntryFrame(tk.Frame):
             font=("Helvetica", 14, "bold"), 
             bg="#2E3440", fg="#D8A657"
         )
-        label2.place(x=78.0, y=150.0, width=100.0, height=37.0)
+        label2.place(
+            x=152.5,
+            y=150.0,
+            width=100.0, 
+            height=37.0)
         self.type = ttk.Combobox(
             self,
             values=["Action", "Comedy", "Drama", "Horror", "Sci-Fi"]
         )
         self.type.place(
-            x=225.0, 
+            x=299.5, 
             y=150.0, 
             width=300.0, 
             height=37.0
@@ -227,13 +242,17 @@ class FilmEntryFrame(tk.Frame):
             bg="#2E3440", 
             fg="#D8A657"
         )
-        label3.place(x=78.0, y=225.0, width=100.0, height=37.0)
+        label3.place(
+            x=152.5,
+            y=225.0, 
+            width=100.0,
+            height=37.0)
         self.status = ttk.Combobox(
             self,
             values=["Watched", "Not Watched"]
         )
         self.status.place(
-            x=225.0, 
+            x=299.5, 
             y=225.0, 
             width=300.0, 
             height=37.0
@@ -244,7 +263,7 @@ class FilmEntryFrame(tk.Frame):
             text="Star", 
             font=("Helvetica", 14, "bold"), bg="#2E3440", fg="#D8A657")
         label4.place(
-            x=78.0, 
+            x=152.5, 
             y=300.0, 
             width=100.0, 
             height=37.0
@@ -256,7 +275,7 @@ class FilmEntryFrame(tk.Frame):
             wrap = True
         )
         self.star.place(
-            x=225.0, 
+            x=299.5, 
             y=300.0, 
             width=300.0, 
             height=37.0
@@ -270,14 +289,14 @@ class FilmEntryFrame(tk.Frame):
             fg="#D8A657"
         )
         label5.place(
-            x=78.0, 
+            x=152.5, 
             y=375.0, 
             width=100.0, 
             height=37.0
         )
         self.note = tk.Entry(self)
         self.note.place(
-            x=225.0, 
+            x=299.5, 
             y=375.0, 
             width=300.0, 
             height=37.0
@@ -321,11 +340,18 @@ class FilmEntryFrame(tk.Frame):
         if hasattr(sys, '_MEIPASS'):
             return Path(sys._MEIPASS) / 'assets' / 'frame1'
         return Path(__file__).parent / 'assets' / 'frame1' 
+        
     
     def on_submit_button_clicked(self, frame, name=None,type=None,status=None,star=None,note=None):
         global filtered, selected_film, inputfilm, isFilter, isEdit
         c = Controller()
         films = c.loadFilms()
+        try:
+            if not name.get() or not type.get() or not status.get() or not star.get() or not note.get():
+                raise Exception("All fields are required")
+        except Exception as e:
+            tk.messagebox.showerror("Error", e)
+            return
         inputfilm = {
             "name": name.get(),
             "type": type.get(),
@@ -370,6 +396,9 @@ class FilmEntryFrame(tk.Frame):
                 filtered_films = temp_filtered
             filtered = filtered_films
         elif isEdit:
+            answer=askyesno("Edit", "Are you sure you want to edit this film?")
+            if not answer:
+                return
             for i, film in enumerate(films):
                 if film == selected_film:
                     films[i] = inputfilm
@@ -408,13 +437,19 @@ class FilmListFrame(tk.Frame):
         self.label_b = tk.Label(self, image=self.photo)
         self.label_b.place(x=0, y=0)
 
+        self.image1 = Image.open(self.relative_to_assets("image_3o.png")).resize((400,100))
+        self.photo1 = ImageTk.PhotoImage(self.image1)
+
+
         self.label_t = tk.Label(
             self,
+            compound="center",
             text="List of Films",
             fg="#000000",
-            font=("Inter", 29 * -1)
+            font=("Inter", 29 * -1),
+            image=self.photo1
         )
-        self.label_t.place(x=361.0, y=47.0)
+        self.label_t.place(x=250, y=20.0)
 
         self.tree = ttk.Treeview(
             self,
@@ -523,38 +558,51 @@ class FilmListFrame(tk.Frame):
         global isEdit, selected_film
         isEdit = True
         selected_item = self.tree.selection()
-        if selected_item:
-            film_values = self.tree.item(selected_item, "values")
-            selected_film = {
-                "name": film_values[0],
-                "type": film_values[1],
-                "status": film_values[2],
-                "star": int(film_values[3]),
-                "note": film_values[4],
-            }
-        self.controller1.show_frame(FilmEntryFrame)
+        try:
+            if not selected_item:
+                raise Exception("Please select a film to edit")
+            if selected_item:
+                film_values = self.tree.item(selected_item, "values")
+                selected_film = {
+                    "name": film_values[0],
+                    "type": film_values[1],
+                    "status": film_values[2],
+                    "star": int(film_values[3]),
+                    "note": film_values[4],
+                }
+            self.controller1.show_frame(FilmEntryFrame)
+        except Exception as e:
+            tk.messagebox.showerror("Error", e)
+            return
 
     def delete_data(self):
         c = Controller()
         films = c.loadFilms()
-        selected_item = self.tree.selection() 
-        if selected_item:
-            film_values = self.tree.item(selected_item, "values")
-            film_to_delete = {
-                "name": film_values[0],
-                "type": film_values[1],
-                "status": film_values[2],
-                "star": int(film_values[3]),
-                "note": film_values[4],
-            }
-
-        for i, film in enumerate(films):
-            if film == film_to_delete:
-                del films[i]
-                break
-
-        self.tree.delete(selected_item) 
-        c.saveFilms(films)
+        selected_item = self.tree.selection()
+        try:
+            if not selected_item:
+                raise Exception("Please select a film to delete") 
+            if selected_item:
+                film_values = self.tree.item(selected_item, "values")
+                film_to_delete = {
+                    "name": film_values[0],
+                    "type": film_values[1],
+                    "status": film_values[2],
+                    "star": int(film_values[3]),
+                    "note": film_values[4],
+                }
+            answer=askyesno("Delete", "Are you sure you want to delete this film?")
+            if not answer:
+                return
+            for i, film in enumerate(films):
+                if film == film_to_delete:
+                    del films[i]
+                    break
+            self.tree.delete(selected_item) 
+            c.saveFilms(films)
+        except Exception as e:
+            tk.messagebox.showerror("Error", e)
+            return        
     
 app = InitialApp()
 app.mainloop()
