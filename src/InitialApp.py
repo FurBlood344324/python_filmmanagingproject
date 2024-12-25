@@ -105,7 +105,8 @@ class FilmManegementFrame(tk.Frame):
         self.label_t1 = tk.Label(
             self,
             text="© 2024 Film Management App",
-            fg="#FF7F50",  # Accent color
+            fg="#F3F3F3",
+            bg="#2E3440",  # Accent color
             font=("Helvetica", 10)
         )
         self.label_t1.place(x=340.0, y=570.0)
@@ -150,6 +151,17 @@ class FilmManegementFrame(tk.Frame):
             width=250.0,
             height=50.0
         )
+        self.infoButton = ttk.Button(
+            self,
+            text="Info",
+            command= self.infoAboutApp
+        )
+        self.infoButton.place(
+            x=315.0,
+            y=356.0,
+            width=250.0,
+            height=50.0
+        )
         
 
     def relative_to_assets(self, path: str) -> Path:
@@ -169,6 +181,34 @@ class FilmManegementFrame(tk.Frame):
         global isAdd
         isAdd = False
         self.controller1.show_frame(FilmListFrame)
+    def infoAboutApp(self):
+        global infoPop
+        self.infoPop = tk.Toplevel() 
+        self.infoPop.title("Info about the app")
+        self.infoPop.geometry("600x350")
+        self.infoPop.configure(bg="#2E3440")
+        self.headerLabel = tk.Label(self.infoPop, text="How to use", bg="#2E3440", fg="#FFBF00", font=("Helvetica", 30, "bold"))
+        self.infoLabel = tk.Label(self.infoPop, 
+                            text="""1. Click on Start button to add a film
+2. Click on List button to view all films
+3. Click on Filter button to filter films
+4. Click on Edit button to edit a film
+5. Click on Delete button to delete a film
+6. Click on Back button to go back to previous screen""", 
+                            bg="#2E3440", 
+                            fg="#40E0D0", 
+                            font=("Helvetica", 14, "bold"),
+                            justify="left",
+                            anchor="w",
+                            padx=10
+                            )
+        self.headerLabel.place(x=200, y=10)
+        self.infoLabel.place(x=10, y=75)
+        self.gotItButton = tk.Button(self.infoPop, text="Got it!", command=self.infoPop.destroy, bg="#FFBF00", fg="#36454F",width=6, height=1,font=("Helvetica", 14, "bold"))
+        self.gotItButton.place(x=400, y=250)
+        # tk.messagebox.showinfo("Info", "This is a film management app\nHow to use?\n1. Click on Start button to add a film\n2. Click on List button to view all films\n3. Click on Filter button to filter films\n4. Click on Edit button to edit a film\n5. Click on Delete button to delete a film\n6. Click on Back button to go back to previous screen")
+
+        
 
 class FilmEntryFrame(tk.Frame):
     def __init__(self, parent, controller):
@@ -226,7 +266,7 @@ class FilmEntryFrame(tk.Frame):
             height=37.0)
         self.type = ttk.Combobox(
             self,
-            values=["Action", "Comedy", "Drama", "Horror", "Sci-Fi"]
+            values=["Action", "Comedy", "Drama", "Horror", "Sci-Fi","Thriller","Romance","Fantasy","Animation","Documentary"]
         )
         self.type.place(
             x=299.5, 
@@ -249,7 +289,7 @@ class FilmEntryFrame(tk.Frame):
             height=37.0)
         self.status = ttk.Combobox(
             self,
-            values=["Watched", "Not Watched"]
+            values=["Watched", "Neglected"]
         )
         self.status.place(
             x=299.5, 
@@ -311,7 +351,7 @@ class FilmEntryFrame(tk.Frame):
             font=("Helvetica", 14, "bold")
         )
         button.place(
-            x=225.0, 
+            x=275.0, 
             y=450.0, 
             width=300.0, 
             height=37.0
@@ -326,7 +366,7 @@ class FilmEntryFrame(tk.Frame):
             font=("Helvetica", 14, "bold")
         )
         backbutton.place(
-            x=225.0, 
+            x=275.0, 
             y=500.0, 
             width=300.0, 
             height=37.0
@@ -445,11 +485,15 @@ class FilmListFrame(tk.Frame):
             self,
             compound="center",
             text="List of Films",
-            fg="#000000",
-            font=("Inter", 29 * -1),
+            fg="#F4BB44",
+            font=("Inter", 40),
             image=self.photo1
         )
         self.label_t.place(x=250, y=20.0)
+
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.style.configure("Treeview",background="#12A4D9",foreground="#2E3440",fieldbackground="#FF6E40")
 
         self.tree = ttk.Treeview(
             self,
