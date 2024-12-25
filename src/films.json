@@ -26,5 +26,12 @@
         "status": "Not Watched",
         "star": 4,
         "note": "ggg"
+    },
+    {
+        "name": "wdsadsa",
+        "type": "",
+        "status": "",
+        "star": 0,
+        "note": ""
     }
 ]
