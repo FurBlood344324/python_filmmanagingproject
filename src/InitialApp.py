@@ -343,15 +343,9 @@ class FilmEntryFrame(tk.Frame):
         
     
     def on_submit_button_clicked(self, frame, name=None,type=None,status=None,star=None,note=None):
-        global filtered, selected_film, inputfilm, isFilter, isEdit
+        global filtered, selected_film, inputfilm, isFilter, isEdit,isAdd
         c = Controller()
         films = c.loadFilms()
-        try:
-            if not name.get() or not type.get() or not status.get() or not star.get() or not note.get():
-                raise Exception("All fields are required")
-        except Exception as e:
-            tk.messagebox.showerror("Error", e)
-            return
         inputfilm = {
             "name": name.get(),
             "type": type.get(),
@@ -361,7 +355,13 @@ class FilmEntryFrame(tk.Frame):
         }
         filtered = []
         temp_filtered = []
-
+        if isAdd:
+            try:
+                if not name.get() or not type.get() or not status.get() or not star.get() or not note.get():
+                    raise Exception("All fields are required")
+            except Exception as e:
+                tk.messagebox.showerror("Error", e)
+                return
         if isFilter:            
             filtered_films = films
             if name.get():
@@ -571,6 +571,13 @@ class FilmListFrame(tk.Frame):
                     "note": film_values[4],
                 }
             self.controller1.show_frame(FilmEntryFrame)
+            fef = self.controller1.frames[FilmEntryFrame]
+            fef.name.insert(0, selected_film["name"])
+            fef.type.set(selected_film["type"])
+            fef.status.set(selected_film["status"])
+            fef.star.delete(0, tk.END)
+            fef.star.insert(0, selected_film["star"])
+            fef.note.insert(0, selected_film["note"])
         except Exception as e:
             tk.messagebox.showerror("Error", e)
             return

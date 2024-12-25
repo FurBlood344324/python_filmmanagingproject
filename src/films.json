@@ -1,37 +1,9 @@
 [
     {
-        "name": "sdfssfs",
-        "type": "Comedy",
-        "status": "Watched",
-        "star": 1,
-        "note": "sfsf"
-    },
-    {
-        "name": "dfsfsdfsfs",
-        "type": "Drama",
-        "status": "Not Watched",
-        "star": 3,
-        "note": "sfssf"
-    },
-    {
-        "name": "fdsfsdfsdf",
-        "type": "Drama",
-        "status": "Not Watched",
-        "star": 3,
-        "note": "sdfsfsdf"
-    },
-    {
-        "name": "abc",
+        "name": "Spider man 7",
         "type": "Comedy",
         "status": "Not Watched",
-        "star": 4,
-        "note": "ggg"
-    },
-    {
-        "name": "wdsadsa",
-        "type": "",
-        "status": "",
-        "star": 0,
-        "note": ""
+        "star": 5,
+        "note": "Nice"
     }
 ]
