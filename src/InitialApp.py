@@ -206,7 +206,7 @@ class FilmManegementFrame(tk.Frame):
         self.infoLabel.place(x=10, y=75)
         self.gotItButton = tk.Button(self.infoPop, text="Got it!", command=self.infoPop.destroy, bg="#FFBF00", fg="#36454F",width=6, height=1,font=("Helvetica", 14, "bold"))
         self.gotItButton.place(x=400, y=250)
-        # tk.messagebox.showinfo("Info", "This is a film management app\nHow to use?\n1. Click on Start button to add a film\n2. Click on List button to view all films\n3. Click on Filter button to filter films\n4. Click on Edit button to edit a film\n5. Click on Delete button to delete a film\n6. Click on Back button to go back to previous screen")
+        self.infoPop.mainloop()
 
         
 
@@ -308,16 +308,13 @@ class FilmEntryFrame(tk.Frame):
             width=100.0, 
             height=37.0
         )
-        self.star = tk.Spinbox(
-            self,
-            from_= 0,
-            to = 5,
-            wrap = True
-        )
+        self.star = StarRating(self)
+
+
         self.star.place(
-            x=299.5, 
-            y=300.0, 
-            width=300.0, 
+            x=299.5,
+            y=300.0,
+            width=300.0,
             height=37.0
         )
 
@@ -345,7 +342,7 @@ class FilmEntryFrame(tk.Frame):
         button = tk.Button(
             self, 
             text="Submit", 
-            command=lambda : self.on_submit_button_clicked(FilmListFrame, self.name, self.type, self.status, self.star, self.note),
+            command=lambda : self.on_submit_button_clicked(FilmListFrame, self.name, self.type, self.status, self.note),
             bg="#D8A657", 
             fg="#2E3440", 
             font=("Helvetica", 14, "bold")
@@ -382,7 +379,7 @@ class FilmEntryFrame(tk.Frame):
         return Path(__file__).parent / 'assets' / 'frame1' 
         
     
-    def on_submit_button_clicked(self, frame, name=None,type=None,status=None,star=None,note=None):
+    def on_submit_button_clicked(self, frame, name=None,type=None,status=None,note=None):
         global filtered, selected_film, inputfilm, isFilter, isEdit,isAdd
         c = Controller()
         films = c.loadFilms()
@@ -390,14 +387,14 @@ class FilmEntryFrame(tk.Frame):
             "name": name.get(),
             "type": type.get(),
             "status": status.get(),
-            "star": int(star.get()),
+            "star": self.star.get(),
             "note": note.get()
         }
         filtered = []
         temp_filtered = []
         if isAdd:
             try:
-                if not name.get() or not type.get() or not status.get() or not star.get() or not note.get():
+                if not name.get() or not type.get() or not status.get() or not self.star.get() or not note.get():
                     raise Exception("All fields are required")
             except Exception as e:
                 tk.messagebox.showerror("Error", e)
@@ -422,10 +419,11 @@ class FilmEntryFrame(tk.Frame):
                     if status.get().lower() in film["status"].lower():
                         temp_filtered.append(film)
                 filtered_films = temp_filtered
-            if star.get() != "0":
+            starRate = self.star.get()
+            if starRate > 0:
                 temp_filtered = []
                 for film in filtered_films:
-                    if film["star"] == int(star.get()):
+                    if film["star"] == starRate:
                         temp_filtered.append(film)
                 filtered_films = temp_filtered
             if note.get():
@@ -449,7 +447,7 @@ class FilmEntryFrame(tk.Frame):
         name.delete(0, tk.END)
         type.delete(0, tk.END)
         status.delete(0, tk.END)
-        star.delete(0, 0)
+        self.star.set_rating(0)  
         note.delete(0, tk.END)
         self.controller1.show_frame(frame)
         
@@ -619,8 +617,7 @@ class FilmListFrame(tk.Frame):
             fef.name.insert(0, selected_film["name"])
             fef.type.set(selected_film["type"])
             fef.status.set(selected_film["status"])
-            fef.star.delete(0, tk.END)
-            fef.star.insert(0, selected_film["star"])
+            fef.star.set_rating(selected_film["star"])  
             fef.note.insert(0, selected_film["note"])
         except Exception as e:
             tk.messagebox.showerror("Error", e)
@@ -653,7 +650,66 @@ class FilmListFrame(tk.Frame):
             c.saveFilms(films)
         except Exception as e:
             tk.messagebox.showerror("Error", e)
-            return        
+            return 
+class StarRating(tk.Frame):
+    def __init__(self, parent, initial_rating=0):
+        super().__init__(parent, bg="#2E3440")
+        self.rating = tk.IntVar(value=initial_rating)
+        self.stars = []
+        
     
+        self.clear_button = tk.Label(
+            self,
+            text="❌",
+            font=("Arial", 20),
+            bg="#2E3440",
+            fg="#D70040",
+            cursor="hand2"
+        )
+        self.clear_button.grid(row=0, column=5, padx=(10,2))
+        self.clear_button.bind('<Button-1>', lambda e: self.set_rating(0))
+        
+        for i in range(5):
+            star = tk.Label(
+                self,
+                text="★",
+                font=("Arial", 20),
+                bg="#2E3440",
+                fg="#FFFFFF",
+                cursor="hand2"
+            )
+            star.grid(row=0, column=i, padx=2)
+            star.bind('<Button-1>', lambda e, index=i: self.set_rating(index + 1))
+            star.bind('<Enter>', lambda e, index=i: self.hover(index + 1))
+            star.bind('<Leave>', lambda e: self.leave())
+            self.stars.append(star)
+        
+        if initial_rating > 0:
+            self.set_rating(initial_rating)
+
+    def set_rating(self, value):
+        self.rating.set(value)
+        self.update_stars()
+    
+    def get(self):
+        return self.rating.get()
+    
+    def hover(self, value):
+        for i in range(5):
+            if i < value:
+                self.stars[i].config(fg="#FFD700")
+            else:
+                self.stars[i].config(fg="#FFFFFF")
+    
+    def leave(self):
+        self.update_stars()
+    
+    def update_stars(self):
+        rating = self.rating.get()
+        for i in range(5):
+            if i < rating:
+                self.stars[i].config(fg="#FFD700")
+            else:
+                self.stars[i].config(fg="#FFFFFF")
 app = InitialApp()
 app.mainloop()
