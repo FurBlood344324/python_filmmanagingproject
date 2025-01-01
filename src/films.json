@@ -1,0 +1,52 @@
+[
+    {
+        "Yenikullanici": [
+            {
+                "name": "deneme",
+                "type": "Comedy",
+                "status": "Neglected",
+                "star": 5,
+                "note": "good"
+            },
+            {
+                "name": "deneme2",
+                "type": "Action",
+                "status": "Watched",
+                "star": 5,
+                "note": "d"
+            },
+            {
+                "name": "deneme3",
+                "type": "Comedy",
+                "status": "Watched",
+                "star": 5,
+                "note": "deneme3"
+            },
+            {
+                "name": "adsssa",
+                "type": "ads",
+                "status": "ads",
+                "star": 3,
+                "note": "ads"
+            },
+            {
+                "name": "ds",
+                "type": "sd",
+                "status": "ds",
+                "star": 4,
+                "note": "ds"
+            }
+        ]
+    },
+    {
+        "denemeadam": [
+            {
+                "name": "h",
+                "type": "h",
+                "status": "h",
+                "star": 5,
+                "note": "h"
+            }
+        ]
+    }
+]
