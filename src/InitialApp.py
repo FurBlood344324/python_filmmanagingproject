@@ -1,19 +1,22 @@
 from pathlib import Path
 import tkinter as tk
-import sys, json
+import sys, json, requests
 from tkinter import ttk
 from PIL import Image, ImageTk
 from tkinter import messagebox
 from tkinter import simpledialog
+from io import BytesIO
 from tkinter.messagebox import askyesno
 
 filtered = []
 inputfilm = {}
 selected_film = {}
 LoginedUser = []
+tmdbmovies = []
 isAdd = False
 isFilter = False
 isEdit = False
+apikey = "9fbee273aced307f11def9e00ba797bf"
 
 class Controller:
     def __init__(self):
@@ -46,7 +49,6 @@ class Controller:
 
         for user in data:
             if userName in user.keys():
-                print("test")
                 index=data.index(user)
                 isEqual=True
                 user[userName] = filmsdata
@@ -84,7 +86,7 @@ class InitialApp(tk.Tk):
 
         self.frames = {}
 
-        for f in [FilmManegementFrame, FilmEntryFrame, FilmListFrame, LoginFrame, RegisterFrame]:
+        for f in [FilmManegementFrame, FilmEntryFrame, FilmListFrame, LoginFrame, RegisterFrame, TMDBSearchFrame]:
             frame = f(container, self)
             self.frames[f] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -167,6 +169,18 @@ class FilmManegementFrame(tk.Frame):
             "TButton",
             background=[("active", "#A3BE8C")],  # Greenish tone on hover
             relief=[("pressed", "flat")]
+        )
+
+        self.TMDB_button = ttk.Button(
+            self,
+            text="TMDB Search",
+            command=self.on_TMDB_button_clicked
+        )
+        self.TMDB_button.place(
+            x=315.0,
+            y=179.0,
+            width=250.0,
+            height=50.0
         )
 
         self.start_button = ttk.Button(
@@ -261,6 +275,9 @@ class FilmManegementFrame(tk.Frame):
         self.gotItButton = tk.Button(self.infoPop, text="Got it!", command=self.infoPop.destroy, bg="#FFBF00", fg="#36454F",width=6, height=1,font=("Helvetica", 14, "bold"))
         self.gotItButton.place(x=400, y=250)
         self.infoPop.mainloop()
+
+    def on_TMDB_button_clicked(self):
+        self.controller1.show_frame(TMDBSearchFrame)
 
         
 
@@ -1030,6 +1047,149 @@ class RegisterFrame(tk.Frame):
         return Path(__file__).parent / 'assets' / 'frame4'
 
 
+class TMDBSearchFrame(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        self.controller1 = controller
+
+        self.config(
+            width=881,
+            height=599,
+            bg="#2E3440",
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.ASSETS_PATH = self.get_base_path()
+
+        self.grid_propagate(False)
+        self.pack_propagate(False)
+        
+        self.image = Image.open(self.relative_to_assets("image_2.jpg"))
+        self.photo = ImageTk.PhotoImage(self.image)
+        self.label_b = tk.Label(self, image=self.photo)
+        self.label_b.place(x=0, y=0)
+    
+        labelSearch = tk.Label(
+            self,
+            text="Search",
+            font=("Helvetica", 14, "bold"),
+            bg="#2E3440",
+            fg="#D8A657"
+        )
+        labelSearch.place(
+            x=250,
+            y=250.0,
+            width=100.0,
+            height=37.0
+        )
+
+        entrySearch = tk.Entry(self)
+        entrySearch.place(
+            x=400,
+            y=250.0,
+            width=200.0,
+            height=37.0
+        )
+
+        submitButton = tk.Button(
+            self,
+            text="Submit",
+            command=lambda: self.on_submit_button_clicked(entrySearch),
+            bg="#D8A657",
+            fg="#2E3440",
+            font=("Helvetica", 14, "bold")
+        )
+        submitButton.place(
+            x=400,
+            y=300.0,
+            width=200.0,
+            height=37.0
+        )
+
+        BackButton = tk.Button(
+            self,
+            text="Back",
+            command=lambda: self.on_back_button_clicked(FilmManegementFrame),
+            bg="#D8A657",
+            fg="#2E3440",
+            font=("Helvetica", 14, "bold")
+        )
+        BackButton.place(
+            x=400, 
+            y=350.0,
+            width=200.0,
+            height=37.0
+        )
+
+    def on_submit_button_clicked(self, entrySearch):
+        global apikey, tmdbmovies
+        url = f"https://api.themoviedb.org/3/search/movie"
+        params = {
+            "api_key": apikey,
+            "query": entrySearch.get(),
+            "language": "tr-TR",
+            "page": 1
+        }
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        results = response.json().get("results", [])
+        tmdbmovies = []
+
+        for i, movie in enumerate(results[:1]):  # İlk 3 sonucu göster
+            title = movie.get("title", "Bilinmiyor")
+            release_date = movie.get("release_date", "Bilinmiyor")
+            banner = movie.get("poster_path", "")
+            description = movie.get("overview", "")
+            self.add_movie_to_db(title, banner, release_date, description)
+
+        global tmdbPop
+        self.tmdbPop = tk.Toplevel() 
+        self.tmdbPop.title("Info about the app")
+        self.tmdbPop.geometry("500x500")
+        self.tmdbPop.configure(bg="#2E3440")
+        self.headerLabel = tk.Label(self.tmdbPop, text="TMDB Search", bg="#2E3440", fg="#FFBF00", font=("Helvetica", 30, "bold"))
+        self.titlelabel = tk.Label(self.tmdbPop, text=f"Title: {tmdbmovies[0]['name']}", bg="#2E3440", fg="#FFBF00", font=("Helvetica", 14, "bold"))
+        self.releaselabel = tk.Label(self.tmdbPop, text=f"Release Date: {tmdbmovies[0]['release_date']}", bg="#2E3440", fg="#FFBF00", font=("Helvetica", 14, "bold"))
+        response1 = requests.get(tmdbmovies[0]['banner'])
+        response1.raise_for_status()
+        image_data = BytesIO(response1.content)
+        image = Image.open(image_data)
+        resized_image = image.resize((200, 250), Image.Resampling.LANCZOS)
+        image_tk = ImageTk.PhotoImage(resized_image)
+        self.banner = tk.Label(self.tmdbPop, image=image_tk) 
+        self.banner.image = image_tk
+        self.headerLabel.place(x=125, y=10)
+        self.titlelabel.place(x=10, y=75)
+        self.releaselabel.place(x=10, y=125)
+        self.banner.place(x=10, y=175)
+        print(tmdbmovies[0]['description'])
+
+
+    def on_back_button_clicked(self, frame):
+        self.controller1.show_frame(FilmManegementFrame)
+
+    def relative_to_assets(self, path: str) -> Path:
+        return self.ASSETS_PATH / Path(path)
+
+    def get_base_path(self):
+        if hasattr(sys, '_MEIPASS'):
+            return Path(sys._MEIPASS) / 'assets' / 'frame5'
+        return Path(__file__).parent / 'assets' / 'frame5'
+    
+    def add_movie_to_db(self, name, banner, release_date, description):
+        global tmdbmovies
+        status = "Neglected"
+        base_url = "https://image.tmdb.org/t/p/w500"
+        banner_url = f"{base_url}{banner}" if banner else ""
+        tmdbmovies.append({
+                "name": name,
+                "status": status,
+                "banner": banner_url,
+                "release_date": release_date,
+                "description": description
+                })
 
 app = InitialApp()
 app.mainloop()
