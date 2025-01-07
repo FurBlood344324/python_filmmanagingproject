@@ -16,7 +16,7 @@ tmdbmovies = []
 isAdd = False
 isFilter = False
 isEdit = False
-apikey = "9fbee273aced307f11def9e00ba797bf"
+apikey = ""
 
 class Controller:
     def __init__(self):
